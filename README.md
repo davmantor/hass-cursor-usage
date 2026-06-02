@@ -2,8 +2,6 @@
 
 A custom Home Assistant integration that monitors your OpenAI Codex subscription usage.
 
-![Codex Usage Screenshot](screenshot.jpg)
-
 ## Sensors
 
 - **Session Usage** - Current primary Codex usage window utilization (%)
