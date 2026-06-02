@@ -1,0 +1,2 @@
+- verify the Codex usage API response shape on the target Home Assistant host
+- add repository topics to fix HACS validation warning, e.g. home-assistant, hacs, integration, codex, openai

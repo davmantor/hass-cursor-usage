@@ -1,0 +1,36 @@
+views:
+  - title: Home
+    cards:
+      - type: history-graph
+        entities:
+          - entity: sensor.codex_usage_session_usage
+            name: Session usage
+          - entity: sensor.codex_usage_weekly_usage
+            name: Weekly usage
+          - entity: sensor.codex_usage_weekly_usage_pace
+            name: Weekly usage pace
+        title: Codex Usage
+        hours_to_show: 24
+
+      - type: entities
+        entities:
+          - entity: sensor.codex_usage_session_reset_time
+            secondary_info: state
+            name: Session reset
+          - entity: sensor.codex_usage_weekly_reset_time
+            secondary_info: state
+            name: Weekly reset
+          - entity: sensor.codex_usage_session_usage
+            secondary_info: last-updated
+            name: Session usage
+          - entity: sensor.codex_usage_weekly_usage_pace
+            name: Weekly usage pace
+          - entity: sensor.codex_usage_rate_limit_reached
+            name: Rate limit reached
+
+      - type: history-graph
+        entities:
+          - entity: sensor.codex_usage_credits_balance
+            name: Credits
+        hours_to_show: 24
+        title: Credits
