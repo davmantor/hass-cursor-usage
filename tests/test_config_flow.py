@@ -174,7 +174,14 @@ except ImportError:
         }
     )
 
-if "voluptuous" not in sys.modules:
+try:
+    import voluptuous as _vol_check  # noqa: F401
+    del _vol_check
+    _vol_needs_stub = False
+except ImportError:
+    _vol_needs_stub = True
+
+if _vol_needs_stub:
     _vol = types.ModuleType("voluptuous")
 
     class _Invalid(Exception):
