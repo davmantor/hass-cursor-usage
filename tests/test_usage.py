@@ -40,7 +40,7 @@ def test_parse_uses_direct_percent_and_z_reset() -> None:
 def test_parse_computes_rounded_percent_when_direct_value_is_missing() -> None:
     result = usage.parse_usage({"individualUsage": {"plan": {"used": 1, "limit": 3}}})
 
-    assert result["monthly_usage"] == 33.33
+    assert result["monthly_usage"] == 33.3
 
 
 def test_parse_preserves_over_limit_usage() -> None:
@@ -224,7 +224,7 @@ def test_new_fields_all_present_in_full_fixture() -> None:
     assert result["requests_used"] == 73
     assert result["requests_limit"] == 2000
     assert result["requests_remaining"] == 1927
-    assert result["auto_percent_used"] == 1.62
+    assert result["auto_percent_used"] == 1.6
     assert result["api_percent_used"] == 0.0
     assert result["requests_included"] == 500
     assert result["requests_bonus"] == 100

@@ -16,14 +16,14 @@ def parse_usage(raw: dict[str, Any]) -> dict[str, Any]:
     if isinstance(plan, dict):
         direct = _non_negative_number(plan.get("totalPercentUsed"))
         if direct is not None:
-            data["monthly_usage"] = direct
+            data["monthly_usage"] = round(direct, 1)
         else:
             used = _non_negative_number(plan.get("used"))
             limit = _positive_number(plan.get("limit"))
             if used is not None and limit is not None:
                 computed = used / limit * 100
                 if math.isfinite(computed):
-                    data["monthly_usage"] = round(computed, 2)
+                    data["monthly_usage"] = round(computed, 1)
 
         req_used = _non_negative_integer(plan.get("used"))
         if req_used is not None:
@@ -39,11 +39,11 @@ def parse_usage(raw: dict[str, Any]) -> dict[str, Any]:
 
         auto_pct = _non_negative_number(plan.get("autoPercentUsed"))
         if auto_pct is not None:
-            data["auto_percent_used"] = auto_pct
+            data["auto_percent_used"] = round(auto_pct, 1)
 
         api_pct = _non_negative_number(plan.get("apiPercentUsed"))
         if api_pct is not None:
-            data["api_percent_used"] = api_pct
+            data["api_percent_used"] = round(api_pct, 1)
 
         breakdown = plan.get("breakdown")
         if isinstance(breakdown, dict):
