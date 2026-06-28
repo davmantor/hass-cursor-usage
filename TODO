@@ -1,2 +1,3 @@
-- verify the Codex usage API response shape on the target Home Assistant host
-- add repository topics to fix HACS validation warning, e.g. home-assistant, hacs, integration, codex, openai
+- add repository topics to fix HACS validation warning, e.g. home-assistant, hacs, integration, cursor
+- verify the Cursor usage API response shape on the target Home Assistant host after first live deployment
+- add Cursor trademark artwork to brand/ after verifying redistribution terms

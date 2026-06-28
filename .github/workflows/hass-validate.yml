@@ -2,9 +2,9 @@ name: Home Assistant Integration Test
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   validate-hacs:
@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: HACS validation
-        uses: hacs/action@main
+        uses: hacs/action@v2
         with:
           category: integration
 
@@ -45,7 +45,7 @@ jobs:
       - name: Copy integration to custom_components
         run: |
           mkdir -p config/custom_components
-          cp -r custom_components/hass_codex_usage config/custom_components/
+          cp -r custom_components/hass_cursor_usage config/custom_components/
 
       - name: Test integration import
         run: |
@@ -54,8 +54,8 @@ jobs:
           import sys
 
           try:
-              from custom_components.hass_codex_usage.const import DOMAIN
-              from custom_components.hass_codex_usage import (
+              from custom_components.hass_cursor_usage.const import DOMAIN
+              from custom_components.hass_cursor_usage import (
                   PLATFORMS,
                   async_setup_entry,
                   async_unload_entry,

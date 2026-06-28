@@ -1,0 +1,43 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Cursor Usage",
+        "description": "Enter the path to the Cursor OAuth credentials file on this Home Assistant host.",
+        "data": {"auth_file": "Cursor credentials file"}
+      }
+    },
+    "error": {
+      "auth_file_unreadable": "Could not read the Cursor credentials file",
+      "missing_refresh_token": "The Cursor credentials file does not contain a refresh token"
+    },
+    "abort": {"already_configured": "Cursor Usage is already configured"}
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Cursor Usage Options",
+        "description": "Configure polling between 300 and 3600 seconds.",
+        "data": {"update_interval": "Update interval (seconds)"}
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "monthly_usage": {"name": "Monthly Usage"},
+      "monthly_reset_time": {"name": "Monthly Reset Time"},
+      "api_error": {"name": "API Error"},
+      "requests_used": {"name": "Requests Used"},
+      "requests_limit": {"name": "Request Limit"},
+      "requests_remaining": {"name": "Requests Remaining"},
+      "auto_percent_used": {"name": "Auto Model Usage"},
+      "api_percent_used": {"name": "API Usage"},
+      "requests_included": {"name": "Included Requests"},
+      "requests_bonus": {"name": "Bonus Requests"},
+      "billing_cycle_start": {"name": "Billing Cycle Start"},
+      "membership_type": {"name": "Membership Type"},
+      "is_unlimited": {"name": "Unlimited Plan"},
+      "on_demand_enabled": {"name": "On-Demand Enabled"}
+    }
+  }
+}

@@ -1,4 +1,4 @@
-"""Sensor platform for Codex Usage integration."""
+"""Sensor platform for Cursor Usage integration."""
 
 from __future__ import annotations
 
@@ -14,37 +14,32 @@ from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from . import CodexUsageConfigEntry, CodexUsageCoordinator
-from .const import (
-    CONF_ACCOUNT_NAME,
-    CONF_SUBSCRIPTION_LEVEL,
-    DOMAIN,
-    SENSOR_DEFINITIONS,
-)
+from . import CursorUsageConfigEntry, CursorUsageCoordinator
+from .const import DOMAIN, SENSOR_DEFINITIONS
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: CodexUsageConfigEntry,
+    entry: CursorUsageConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Codex Usage sensors."""
+    """Set up Cursor Usage sensors."""
     coordinator = entry.runtime_data
     async_add_entities(
-        CodexUsageSensor(coordinator, entry, key, name, unit, icon, device_class)
+        CursorUsageSensor(coordinator, entry, key, name, unit, icon, device_class)
         for key, name, unit, icon, device_class in SENSOR_DEFINITIONS
     )
 
 
-class CodexUsageSensor(CoordinatorEntity[CodexUsageCoordinator], SensorEntity):
-    """A sensor for a Codex usage metric."""
+class CursorUsageSensor(CoordinatorEntity[CursorUsageCoordinator], SensorEntity):
+    """A sensor for a Cursor usage metric."""
 
     _attr_has_entity_name = True
 
     def __init__(
         self,
-        coordinator: CodexUsageCoordinator,
-        entry: CodexUsageConfigEntry,
+        coordinator: CursorUsageCoordinator,
+        entry: CursorUsageConfigEntry,
         key: str,
         name: str,
         unit: str | None,
@@ -64,21 +59,9 @@ class CodexUsageSensor(CoordinatorEntity[CodexUsageCoordinator], SensorEntity):
         elif unit is not None:
             self._attr_state_class = SensorStateClass.MEASUREMENT
 
-        account_name = entry.data.get(CONF_ACCOUNT_NAME)
-        subscription_level = entry.data.get(CONF_SUBSCRIPTION_LEVEL)
-
-        device_name_parts = ["Codex Usage"]
-        if account_name:
-            device_name_parts.append(f"({account_name}")
-            if subscription_level:
-                device_name_parts.append(f"- {subscription_level})")
-            else:
-                device_name_parts[-1] += ")"
-        device_name = " ".join(device_name_parts)
-
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
-            name=device_name,
+            name="Cursor Usage",
             entry_type=DeviceEntryType.SERVICE,
         )
 

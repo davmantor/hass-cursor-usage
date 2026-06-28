@@ -36,3 +36,4 @@ Thumbs.db
 auth.json
 .env
 secret.yaml
+.superpowers/

@@ -1,0 +1,11 @@
+{
+  "domain": "hass_cursor_usage",
+  "name": "Cursor Usage",
+  "codeowners": ["@davmantor"],
+  "config_flow": true,
+  "documentation": "https://github.com/davmantor/hass-cursor-usage",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/davmantor/hass-cursor-usage/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

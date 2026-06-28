@@ -1,0 +1,26 @@
+views:
+  - title: Home
+    cards:
+      - type: history-graph
+        title: Cursor Monthly Usage
+        hours_to_show: 168
+        entities:
+          - entity: sensor.cursor_usage_monthly_usage
+            name: Monthly usage
+      - type: entities
+        title: Cursor Usage
+        entities:
+          - entity: sensor.cursor_usage_monthly_usage
+          - entity: sensor.cursor_usage_monthly_reset_time
+          - entity: sensor.cursor_usage_api_error
+          - entity: sensor.cursor_usage_requests_used
+          - entity: sensor.cursor_usage_requests_limit
+          - entity: sensor.cursor_usage_requests_remaining
+          - entity: sensor.cursor_usage_auto_percent_used
+          - entity: sensor.cursor_usage_api_percent_used
+          - entity: sensor.cursor_usage_requests_included
+          - entity: sensor.cursor_usage_requests_bonus
+          - entity: sensor.cursor_usage_billing_cycle_start
+          - entity: sensor.cursor_usage_membership_type
+          - entity: sensor.cursor_usage_is_unlimited
+          - entity: sensor.cursor_usage_on_demand_enabled

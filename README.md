@@ -1,116 +1,152 @@
-# Codex Usage - Home Assistant Integration
+# Cursor Usage — Home Assistant Integration
 
-A custom Home Assistant integration that monitors your OpenAI Codex subscription usage.
+A custom Home Assistant integration that monitors your [Cursor](https://cursor.com) Individual subscription usage.
 
 ## Sensors
 
-- **Session Usage** - Current primary Codex usage window utilization (%)
-- **Session Reset Time** - When the primary usage window resets
-- **Weekly Usage** - Current secondary Codex usage window utilization (%)
-- **Weekly Usage Pace** - How far weekly usage is ahead of or behind the reset window
-- **Weekly Reset Time** - When the weekly usage window resets
-- **Credits Balance** - Remaining Codex credits when reported by the API
-- **Credits Enabled** - Whether credits are available for the account
-- **Rate Limit Reached** - Current backend-reported limit state
+| Sensor | Description |
+|--------|-------------|
+| `sensor.cursor_usage_monthly_usage` | Current monthly usage as a percentage of the included request quota |
+| `sensor.cursor_usage_monthly_reset_time` | Timestamp when the monthly quota resets |
+| `sensor.cursor_usage_api_error` | Error counter — non-zero when the last poll failed |
 
 ## Installation
 
 ### HACS (recommended)
 
-1. Add this repository as a custom repository in HACS
-2. Restart Home Assistant
-3. Install "Codex Usage"
-4. Go to Settings -> Devices & Services -> Add Integration -> "Codex Usage"
-5. Follow the instructions
+1. Add this repository as a custom repository in HACS.
+2. Restart Home Assistant.
+3. Install **Cursor Usage**.
+4. Go to **Settings → Devices & Services → Add Integration → Cursor Usage**.
+5. Follow the setup prompts.
 
 ### Manual
 
-1. Copy `custom_components/hass_codex_usage/` to your HA `custom_components/` directory
-2. Restart Home Assistant
-3. Add the integration via the UI
+1. Copy `custom_components/hass_cursor_usage/` to your HA `custom_components/` directory.
+2. Restart Home Assistant.
+3. Add the integration via the UI.
 
-## Setup
+## Export Credentials
 
-The integration uses Codex OAuth credentials created by the [Codex CLI](https://github.com/davmantor/codex-cli).
+The integration requires a JSON credentials file containing your Cursor OAuth tokens. Cursor does not provide an official CLI export command for Individual accounts. Use the browser-based extraction method below.
 
-### 1. Generate Auth Token
-On the machine where the Codex CLI is installed, run:
-```bash
-codex login
+> **Note:** The Individual usage and OAuth endpoints used by this integration are undocumented and unsupported by Cursor. They may change or be removed without notice.
+
+### Browser-based extraction
+
+1. Log in at [cursor.com](https://cursor.com) in a browser where you are already signed in to Cursor.
+2. Open DevTools (F12) → **Application** → **Cookies** → `https://cursor.com`.
+3. Locate the `access_token` and `refresh_token` cookie or localStorage values.
+4. Save them as described in the next section.
+
+## Manual Credentials File
+
+Create the file at `/config/.cursor/auth.json` on your Home Assistant host with the following schema:
+
+```json
+{
+  "access_token": "<Cursor OAuth access token>",
+  "refresh_token": "<Cursor OAuth refresh token>"
+}
 ```
-This generates an authentication file at `~/.codex/auth.json`.
 
-### 2. Copy Auth File to Home Assistant
-If you are running Home Assistant in **Docker** or **Home Assistant OS**, the integration cannot directly access the host's `~/.codex` directory. Copy the auth file to your Home Assistant `/config` directory once.
+**Security rules:**
+- Set file permissions to `600` (readable only by the HA process).
+- Never commit this file to version control. Add it to `.gitignore`.
+- Do not paste token values into issue reports or logs.
 
-**Example Copy Script (`/usr/local/bin/copy-codex-auth.sh`):**
+The integration reads this file on every poll and automatically refreshes an expired `access_token` using the stored `refresh_token`. If the `refresh_token` is revoked, recreate the file with fresh tokens.
+
+## Copy to Home Assistant
+
+If Home Assistant runs in Docker or Home Assistant OS it cannot read the host filesystem directly. Copy the credentials file once:
+
 ```bash
 #!/bin/bash
-SOURCE="/root/.codex/auth.json"
-DEST="/config/.codex/auth.json"
+SOURCE="$HOME/.cursor/auth.json"   # adjust if needed
+DEST="/config/.cursor/auth.json"
 
 mkdir -p "$(dirname "$DEST")"
 cp "$SOURCE" "$DEST"
-chmod 644 "$DEST"
+chmod 600 "$DEST"
 ```
 
-The integration reads this file at each poll and refreshes expired or near-expired Codex OAuth access tokens in place using the stored `refresh_token`. You do not need a cron job to keep the access token synchronized. If the refresh token is revoked or expires, run `codex login` again and replace the auth file.
+Re-run this script after re-authenticating to Cursor.
 
-### 3. Add Integration
-1. Go to **Settings -> Devices & Services -> Add Integration -> "Codex Usage"**.
+## Setup
+
+1. Go to **Settings → Devices & Services → Add Integration → Cursor Usage**.
 2. When prompted for the **Auth File Path**, enter:
-   ```text
-   /config/.codex/auth.json
    ```
+   /config/.cursor/auth.json
+   ```
+3. Accept the default poll interval or choose a custom value (see Options).
 
-The integration reads this file at each poll. It does not store your access token in the Home Assistant database.
+The integration reads the credentials file on every poll. It does not persist your access token in the Home Assistant configuration database.
 
 ## Options
 
-- **Update interval** - How often to poll the usage API (default: 300 seconds, min: 60, max: 3600).
+| Option | Default | Min | Max | Description |
+|--------|---------|-----|-----|-------------|
+| Update interval | 300 s | 300 s | 3600 s | How often to poll the Cursor usage API |
+
+The minimum interval is **five minutes (300 seconds)**. Polling more frequently is not supported and risks rate-limiting or account suspension.
 
 ## Dashboard
 
-A pre-built dashboard is included in the `dashboards/` directory. To use it:
+A pre-built dashboard YAML is provided in `dashboards/cursor_usage.yaml`. To use it:
 
-1. Go to Settings -> Dashboards -> Add Dashboard
-2. Click the three-dot menu -> "Edit Dashboard"
-3. Click the three-dot menu again -> "Raw configuration editor"
-4. Copy the contents of `dashboards/codex_usage.yaml` and paste it
-5. Click "Save"
+1. Go to **Settings → Dashboards → Add Dashboard**.
+2. Open the three-dot menu → **Edit Dashboard**.
+3. Open the three-dot menu again → **Raw configuration editor**.
+4. Paste the contents of `dashboards/cursor_usage.yaml`.
+5. Click **Save**.
 
-Alternatively, you can manually add the cards to any existing dashboard by referencing the YAML file.
+You can also add the individual cards to any existing dashboard.
 
-## Rate Limit
+## Authentication Recovery
 
-Codex usage APIs are not documented as a public Home Assistant integration surface. Keep the default 300 second polling interval unless you have a specific reason to change it.
+If the `refresh_token` expires or is revoked, the `sensor.cursor_usage_api_error` sensor will become non-zero and the other sensors will stop updating. To recover:
+
+1. Extract fresh tokens from the Cursor browser session (see [Export Credentials](#export-credentials)).
+2. Replace `/config/.cursor/auth.json` with the new values.
+3. Wait for the next poll or reload the integration from **Settings → Devices & Services → Cursor Usage → Reload**.
+
+## Unsupported API Notice
+
+The Cursor Individual usage endpoint (`https://cursor.com/api/usage-summary`) and the OAuth token refresh endpoint (`https://api2.cursor.sh/oauth/token`) are **not documented public APIs**. Cursor may change their behavior, require additional authentication, or remove them at any time without notice. This integration is provided as-is with no warranty of continued function.
 
 ## Development
 
-### Pre-commit Hook
-
-Install the pre-commit hook to automatically format code before committing:
+### Pre-commit hooks
 
 ```bash
 pip install pre-commit
 pre-commit install
 ```
 
-This will run black, isort, ruff, and other checks before committing.
+Runs black, isort, ruff, and other checks before each commit.
 
-### Manual Formatting
+### Manual formatting
 
 ```bash
 pip install black isort ruff
-black custom_components/hass_codex_usage/
-isort custom_components/hass_codex_usage/
-ruff check --fix custom_components/hass_codex_usage/
+black custom_components/hass_cursor_usage/
+isort custom_components/hass_cursor_usage/
+ruff check --fix custom_components/hass_cursor_usage/
+```
+
+### Running tests
+
+```bash
+pip install -e ".[test]"
+pytest tests/
 ```
 
 ## Credits
 
-This integration is a modified version of [hass-claude-usage](https://github.com/trickv/hass-claude-usage) by [Patrick van Staveren](https://github.com/trickv). It has been adapted to work with the OpenAI Codex backend usage API.
+This integration is derived from [hass-claude-usage](https://github.com/trickv/hass-claude-usage) by [Patrick van Staveren](https://github.com/trickv), which was itself adapted from the Cursor usage API. The branching lineage is: hass-claude-usage → hass-codex-usage → hass-cursor-usage.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT License — see [LICENSE](LICENSE) for details.
